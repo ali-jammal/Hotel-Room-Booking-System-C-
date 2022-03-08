@@ -1,0 +1,246 @@
+using System;
+using static System.Console;
+
+public static class HotelService
+{
+    public static void Main()
+    {
+        char userInput;
+        string[] rooms = { null, null, null, null, null, null, null, null, null, null, null, null };
+
+        //Introduction to program
+        WriteLine("Hello! Welcome to Ali's hotel please feel free to choose any of the below options and we will do our best to help you.");
+
+        //do-while statement to execute first user prompt and then evaluate whether the user quits or loops again
+        do
+        {
+            //prompt the user for a command code or to quit
+            WriteLine();
+            Write("Please enter  ‘r’ or ‘R’ to reserve a room, ‘d’ or ‘D’ to delete a room reservation, ‘p’ or ‘P’ to print the room assignments, ‘l’ or ‘L’ to print a list of the available rooms, or ‘q’ or ‘Q’ to quit => ");
+            userInput = Convert.ToChar(ReadLine());
+            WriteLine();
+
+            //switch statement to perfrom executions depending on the user input
+            //uses char.ToUpper() to reduce number of cases
+            switch (Char.ToUpper(userInput))
+            {
+                case 'R':
+                    //Invoke a method to book a hotel room if user never booked before
+                    Reservation(rooms);
+                    break;
+
+                case 'D':
+                    //Invoke a method to delete a booking that was made by the user 
+                    DeleteReservation(rooms);
+                    break;
+
+                case 'P':
+                    //Invoke a method to display the assigned rooms in the hotel and for who
+                    PrintRoomReservations(rooms);
+                    break;
+
+                case 'L':
+                    //Invoke a method to display the available rooms that are not reserved yet
+                    PrintAvailableRoomNums(rooms);
+                    break;
+
+                case 'Q':
+                    break;
+
+                default:
+                    //error message if user inputs wrong command code
+                    WriteLine();
+                    WriteLine("Invalid command code. Please enter valid code or quit using 'q' or 'Q'.");
+                    WriteLine();
+                    break;
+            }
+
+
+        } while (Char.ToUpper(userInput) != 'Q');
+
+        WriteLine();
+        //ending of program
+        WriteLine("Thank you for using my hotel service provider, hope you have a great day!");
+        //holds the output window
+        ReadLine();
+
+    }
+
+    //Method: FindAvailableRoomNum
+    //Parameters
+    //      roomAssign : string storing the array that will be passed from main
+    //local variables:   found - bool variable that will be used to determine the right value to return
+    //                   search - string variable that will be used to search for identitical strings in array
+    //                   location - integer storing the value that will be returned depending on the bool value
+    //Description: searches the array that is passed by Main in order to find available rooms which are null elements
+    //Returns: location value or -1
+    public static int FindAvailableRoomNum(string[] roomAssign)
+    {
+        bool found = false;
+        string search = null;
+        int location = 0;
+        for (int i = 0; i < roomAssign.Length; ++i)
+        {
+            if (search == roomAssign[i])
+            {
+                location = i;
+                found = true;
+            }
+        }
+        if (found == true)
+            return location;
+        else
+            return -1;
+
+
+    }
+
+    //Method: FindGuestRoomNum
+    //Parameters
+    //      gname : name that the user will later input to be serached for in the array
+    //      roomAssign : string storing the array that will be passed from main
+    //local variables:   found - bool variable that will be used to determine the right value to return
+    //                   search - string variable that will be used to search for identitical strings in array
+    //                   location - integer storing the value that will be returned depending on the bool value
+    //Description: searches the array that is passed by Main in order to find rooms that are booked under the same name
+    //Returns: location value or -1
+
+    public static int FindGuestRoomNum(string[] roomAssign, string gName)
+    {
+        bool found = false;
+        string search = gName;
+        int location = 0;
+        for (int i = 0; i < roomAssign.Length; ++i)
+        {
+            if (search == roomAssign[i])
+            {
+                location = i;
+                found = true;
+            }
+        }
+        if (found == true)
+            return location;
+        else
+            return -1;
+                
+    }
+
+    //Method: Reservation
+    //Parameters
+    //      roomAssign : string storing the array that will be passed from main
+    //local variables:   availableRoom - integer value that will store the value from returned from the method 
+    //                   userInput - string variable that will be used store the users name
+    //                   location : integer holding the value that is passed by the method FindGuestRoomNum that will be used to validate whether the user already has a booking
+    //Description: prompts user for their name then checks if the user already hasa booking, if not the method will check
+    //             if there are any other available rooms left and then book a room if there is
+    //Returns: void
+
+    public static void Reservation(string[] roomAssign)
+    {
+        int availableRoom = 0;
+        int location ;
+        string userInput;
+        WriteLine();
+        Write("Please enter your name for the booking => ");
+        userInput = Convert.ToString(ReadLine());
+        WriteLine();
+        location = FindGuestRoomNum(roomAssign, userInput);
+        if (location >= 0)
+        {
+            WriteLine();
+            WriteLine("I'm sorry but it looks like you already have a reservation");
+            WriteLine();
+        }
+        else
+        {
+            availableRoom = FindAvailableRoomNum(roomAssign);
+            if (availableRoom >= 0)
+            {
+                roomAssign[availableRoom] = userInput;
+                WriteLine();
+                WriteLine("Great! We have booked room number {0} under the name {1}.", availableRoom, userInput);
+                WriteLine();
+            }
+            else
+            {
+                WriteLine();
+                WriteLine("I'm sorry dear {0}, but it looks like the hotel is full at the current moment.", userInput);
+                WriteLine();
+            }
+        }
+
+    }
+
+    //Method: DeleteReservation
+    //Parameters
+    //      roomAssign : string storing the array that will be passed from main
+    //local variables:  
+    //                   name - string variable that will be used store the users name
+    //                   location : integer holding the value that is passed by the method FindGuestRoomNum that will be used to validate whether the user has a booking
+    //Description: prompts the user to enter their name and if they have a booking, their booking will be cancelled, otherwise the program 
+    //             will state this name has no booking
+    //Returns: void
+    public static void DeleteReservation(string[] roomAssign)
+    {
+        int location;
+        string name;
+        WriteLine();
+        Write("Please enter your name to find your booking => ");
+        name = Convert.ToString(ReadLine());
+        WriteLine();
+        location = FindGuestRoomNum(roomAssign, name);
+        if (location >= 0)
+        {
+            roomAssign[location] = null;
+            WriteLine();
+            WriteLine("Thank you {0}, your reservation for room number {1} has been cancelled.", name, location);
+            WriteLine();
+        }
+        else
+        {
+            WriteLine();
+            WriteLine("I'm sorry but the name {0} does not have a reservation in this hotel.", name);
+            WriteLine();
+        }
+
+        }
+
+    //Method: PrintRoomReservation
+    //Parameters
+    //      roomAssign : string storing the array that will be passed from main
+    //Description: searches the array for any booked rooms by checking strings that are not null and then displays the booking with their names
+    //Returns: void
+    public static void PrintRoomReservations(string[] roomAssign)
+    {
+        for (int i = 0; i < roomAssign.Length; ++i)
+        {
+            if (roomAssign[i] != null)
+            {
+                WriteLine();
+                WriteLine("The room number {0} is reserved for {1}. ", i, roomAssign[i]);
+                WriteLine();
+            }
+       
+        }
+         
+    }
+
+
+    //Method: PrintAvailableRoomNums
+    //Parameters
+    //      roomAssign : string storing the array that will be passed from main
+    //Description: searches the array for any non-booked rooms by checking strings that are null and then displays the available bookings and their numbers
+    //Returns: void
+    public static void PrintAvailableRoomNums(string[] roomAssign)
+    {
+        for (int i = 0; i < roomAssign.Length; ++i)
+        {
+            if (roomAssign[i] == null)
+            {
+                WriteLine();
+                WriteLine("Room number {0} is available for reservation.", i);
+                WriteLine();
+            }
+        }
+    }
+}
